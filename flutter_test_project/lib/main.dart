@@ -30,6 +30,7 @@ class _PersonListState extends State<PersonList> {
   bool isLoading = false;
   bool noMoreData = false;
   int record = 10;
+  int maxPages = 3;
 
   ScrollController _scrollController = ScrollController();
 
@@ -66,15 +67,13 @@ class _PersonListState extends State<PersonList> {
           persons.addAll(newData);
           record = (page == 1 ?  10 : 20);
           page++;
-          noMoreData = (page > 3 ? true : false);
+          noMoreData = (page > maxPages ? true : false);
         });
-
       } else {
         setState(() {
           noMoreData = true;
         });
       }
-
     } else {
       throw Exception('Failed to load data');
     }
@@ -91,11 +90,8 @@ class _PersonListState extends State<PersonList> {
       isLoading = false;
       persons.clear();
     });
-
     await fetchData();
-
   }
-
 
   void _openDetailsPage(String firstName, String email, String image, String phoneNumber, String gender, String birthday, String city, String zipcode ) {
     Navigator.of(context).push(
@@ -109,30 +105,18 @@ class _PersonListState extends State<PersonList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Person Web List'),
+        title: const Text('Person List'),
       ),
       body: kIsWeb ?
-      // Column(
-      //   children: [
           ListView.builder(
-            // controller: _scrollController,
-            // itemCount: persons.length + (noMoreData ? 1 : 0),
             itemCount: persons.length + 1,
             itemBuilder: (context, index) {
-              int length = persons.length - 1;
-              print(index);
-              print(length);
               if (index < persons.length) {
                 return Card(
                   margin: EdgeInsets.symmetric(vertical: 10),
                   child: ListTile(
-                    // leading: Image.network('$persons[index]["image"]'),
-                    leading:
-                    // index == 1 ? CircleAvatar(
-                    //   backgroundImage: CachedNetworkImageProvider('https://picsum.photos/250?image=9'),
-                    // ) :
-                    CircleAvatar(
-                      // backgroundImage: CachedNetworkImageProvider(persons[index]['image']),
+                    leading: CircleAvatar(
+                      backgroundImage: CachedNetworkImageProvider(persons[index]['image']),
                     ),
                     title: Text(persons[index]['firstname'] + ' ' +persons[index]['lastname'] ),
                     subtitle: Text('Email: ' + persons[index]['email']),
@@ -152,7 +136,6 @@ class _PersonListState extends State<PersonList> {
                     return
                       GestureDetector(
                         onTap: () {
-                          print('Load More button tapped!');
                           fetchData();
                         },
                         child: Container(
@@ -167,196 +150,56 @@ class _PersonListState extends State<PersonList> {
                           ),
                         ),
                       );
-              }
-              // else if (index == persons.length && !noMoreData) {
-              //   if (!isLoading) {
-              //     fetchData();
-              //   }
-              //   return const Padding(
-              //     padding: EdgeInsets.all(8.0),
-              //     child: Center(child: CircularProgressIndicator()),
-              //   );
-              // }
-              else {
+              } else {
                 return const Center(
                   child: Text('No more data.'),
                 );
               }
             },
           )
-          :
-
-        // ],
-      // ) :
-      RefreshIndicator(
-        onRefresh: refreshData,
-        child: ListView.builder(
-          controller: _scrollController,
-          itemCount: persons.length + (noMoreData ? 1 : 0),
-          itemBuilder: (context, index) {
-              if (index < persons.length) {
-                return Card(
-                  margin: EdgeInsets.symmetric(vertical: 10),
-
-                  child: ListTile(
-                    // leading: Image.network('$persons[index]["image"]'),
-                    leading:
-                    // index == 1 ? CircleAvatar(
-                    //   backgroundImage: CachedNetworkImageProvider('https://picsum.photos/250?image=9'),
-                    // ) :
-                    CircleAvatar(
-                        backgroundImage: CachedNetworkImageProvider(persons[index]['image']),
+          : RefreshIndicator(
+            onRefresh: refreshData,
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: persons.length + (noMoreData ? 1 : 0),
+              itemBuilder: (context, index) {
+                  if (index < persons.length) {
+                    return Card(
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                            backgroundImage: CachedNetworkImageProvider(persons[index]['image']),
+                        ),
+                        title: Text(persons[index]['firstname'] + ' ' +persons[index]['lastname'] ),
+                        subtitle: Text('Email: ' + persons[index]['email']),
+                        onTap: () => _openDetailsPage(
+                            persons[index]['firstname'] != null ? persons[index]['firstname'] : 'NA',
+                            persons[index]['email'] != null ? persons[index]['email'] : "NA",
+                            persons[index]['image'] != null ? persons[index]['image'] : "NA",
+                            persons[index]['phone'] != null ? persons[index]['phone'] : "NA",
+                            persons[index]['gender'] != null ? persons[index]['gender'] : "NA",
+                            persons[index]['birthday'] != null ? persons[index]['birthday'] : "NA",
+                            persons[index]['city'] != null ? persons[index]['city'] : "NA",
+                            persons[index]['zipcode'] != null ? persons[index]['zipcode'] : "NA",
+                        ),
                       ),
-                    title: Text(persons[index]['firstname'] + ' ' +persons[index]['lastname'] ),
-                    subtitle: Text('Email: ' + persons[index]['email']),
-                    onTap: () => _openDetailsPage(
-                        persons[index]['firstname'] != null ? persons[index]['firstname'] : 'NA',
-                        persons[index]['email'] != null ? persons[index]['email'] : "NA",
-                        persons[index]['image'] != null ? persons[index]['image'] : "NA",
-                        persons[index]['phone'] != null ? persons[index]['phone'] : "NA",
-                        persons[index]['gender'] != null ? persons[index]['gender'] : "NA",
-                        persons[index]['birthday'] != null ? persons[index]['birthday'] : "NA",
-                        persons[index]['city'] != null ? persons[index]['city'] : "NA",
-                        persons[index]['zipcode'] != null ? persons[index]['zipcode'] : "NA",
-                    ),
-                  ),
-                );
-              } else if (index == persons.length && !noMoreData) {
-                if (!isLoading) {
-                  fetchData();
-                }
-                return const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              } else {
-                return const Center(
-                    child: Text('No more data.'),
-                );
-              }
-          },
-        ),
-      ),
+                    );
+                  } else if (index == persons.length && !noMoreData) {
+                    if (!isLoading) {
+                      fetchData();
+                    }
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  } else {
+                    return const Center(
+                        child: Text('No more data.'),
+                    );
+                  }
+              },
+            ),
+          ),
     );
   }
 }
-
-//
-// import 'dart:convert';
-//
-// import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
-//
-// void main() {
-//   runApp(MyApp());
-// }
-//
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Flutter Web Load More Example',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       home: PersonList(),
-//     );
-//   }
-// }
-//
-// class PersonList extends StatefulWidget {
-//   @override
-//   _PersonListState createState() => _PersonListState();
-// }
-//
-// class _PersonListState extends State<PersonList> {
-//   List<dynamic> persons = [];
-//   int page = 1;
-//   bool isLoading = false;
-//   bool noMoreData = false;
-//
-//   ScrollController _scrollController = ScrollController();
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     fetchData();
-//
-//     _scrollController.addListener(() {
-//       if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
-//         fetchData();
-//       }
-//     });
-//   }
-//
-//   Future<void> fetchData() async {
-//     if (isLoading || noMoreData) return;
-//
-//     setState(() {
-//       isLoading = true;
-//     });
-//
-//     final response = await http.get(
-//       Uri.parse('https://fakerapi.it/api/v1/persons?_quantity=10&_page=$page'),
-//     );
-//
-//     if (response.statusCode == 200) {
-//       final newData = json.decode(response.body)['data'];
-//
-//       if (newData.isNotEmpty) {
-//         setState(() {
-//           persons.addAll(newData);
-//           page++;
-//         });
-//       } else {
-//         setState(() {
-//           noMoreData = true;
-//         });
-//       }
-//     } else {
-//       throw Exception('Failed to load data');
-//     }
-//
-//     setState(() {
-//       isLoading = false;
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Person List - Flutter Web'),
-//       ),
-//       body: Center(
-//         child: Container(
-//           width: 400,
-//           child: ListView.builder(
-//             controller: _scrollController,
-//             itemCount: persons.length + (noMoreData ? 0 : 1),
-//             itemBuilder: (context, index) {
-//               if (index == persons.length && !noMoreData) {
-//                 if (!isLoading) {
-//                   fetchData();
-//                 }
-//                 return Padding(
-//                   padding: const EdgeInsets.all(8.0),
-//                   child: Center(child: CircularProgressIndicator()),
-//                 );
-//               } else {
-//                 final person = persons[index];
-//                 return Card(
-//                   margin: EdgeInsets.symmetric(vertical: 10),
-//                   child: ListTile(
-//                     title: Text(person['firstname']),
-//                     subtitle: Text('Email: ' + person['email']),
-//                   ),
-//                 );
-//               }
-//             },
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

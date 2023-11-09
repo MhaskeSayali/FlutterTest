@@ -24,13 +24,13 @@ class DetailsPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(top : 80.0),
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Container(child: Image.network('https://picsum.photos/250?image=9'), width: 120, height: 120,),
-              // CircleAvatar(
-              //   backgroundImage: CachedNetworkImageProvider(image),
-              //   radius: 70,
-              // ),
+              CircleAvatar(
+                backgroundImage: CachedNetworkImageProvider(image),
+                radius: 70,
+              ),
               SizedBox(height: 20),
               Text('Name: $firstName'),
               SizedBox(height: 15),
