@@ -109,9 +109,86 @@ class _PersonListState extends State<PersonList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Person List'),
+        title: const Text('Person Web List'),
       ),
-      body: RefreshIndicator(
+      body: kIsWeb ?
+      // Column(
+      //   children: [
+          ListView.builder(
+            // controller: _scrollController,
+            // itemCount: persons.length + (noMoreData ? 1 : 0),
+            itemCount: persons.length + 1,
+            itemBuilder: (context, index) {
+              int length = persons.length - 1;
+              print(index);
+              print(length);
+              if (index < persons.length) {
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  child: ListTile(
+                    // leading: Image.network('$persons[index]["image"]'),
+                    leading:
+                    // index == 1 ? CircleAvatar(
+                    //   backgroundImage: CachedNetworkImageProvider('https://picsum.photos/250?image=9'),
+                    // ) :
+                    CircleAvatar(
+                      // backgroundImage: CachedNetworkImageProvider(persons[index]['image']),
+                    ),
+                    title: Text(persons[index]['firstname'] + ' ' +persons[index]['lastname'] ),
+                    subtitle: Text('Email: ' + persons[index]['email']),
+                    onTap: () => _openDetailsPage(
+                      persons[index]['firstname'] != null ? persons[index]['firstname'] : 'NA',
+                      persons[index]['email'] != null ? persons[index]['email'] : "NA",
+                      persons[index]['image'] != null ? persons[index]['image'] : "NA",
+                      persons[index]['phone'] != null ? persons[index]['phone'] : "NA",
+                      persons[index]['gender'] != null ? persons[index]['gender'] : "NA",
+                      persons[index]['birthday'] != null ? persons[index]['birthday'] : "NA",
+                      persons[index]['city'] != null ? persons[index]['city'] : "NA",
+                      persons[index]['zipcode'] != null ? persons[index]['zipcode'] : "NA",
+                    ),
+                  ),
+                );
+              } else if(index == persons.length && !noMoreData) {
+                    return
+                      GestureDetector(
+                        onTap: () {
+                          print('Load More button tapped!');
+                          fetchData();
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(16),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'Load More',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      );
+              }
+              // else if (index == persons.length && !noMoreData) {
+              //   if (!isLoading) {
+              //     fetchData();
+              //   }
+              //   return const Padding(
+              //     padding: EdgeInsets.all(8.0),
+              //     child: Center(child: CircularProgressIndicator()),
+              //   );
+              // }
+              else {
+                return const Center(
+                  child: Text('No more data.'),
+                );
+              }
+            },
+          )
+          :
+
+        // ],
+      // ) :
+      RefreshIndicator(
         onRefresh: refreshData,
         child: ListView.builder(
           controller: _scrollController,

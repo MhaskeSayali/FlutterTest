@@ -27,10 +27,10 @@ class DetailsPage extends StatelessWidget {
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Container(child: Image.network('https://picsum.photos/250?image=9'), width: 120, height: 120,),
-              CircleAvatar(
-                backgroundImage: CachedNetworkImageProvider(image),
-                radius: 70,
-              ),
+              // CircleAvatar(
+              //   backgroundImage: CachedNetworkImageProvider(image),
+              //   radius: 70,
+              // ),
               SizedBox(height: 20),
               Text('Name: $firstName'),
               SizedBox(height: 15),
